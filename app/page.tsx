@@ -278,7 +278,7 @@ export default function Dashboard() {
         <div className="bg-gradient-to-br from-green-500/20 to-emerald-500/20 backdrop-blur-sm rounded-2xl p-6 border border-green-500/30 shadow-2xl">
           <div className="text-center">
             <FaStar className="text-6xl mb-3 text-green-400 mx-auto" />
-            <div className="text-white text-2xl font-bold mb-2">All Systems Operational</div>
+            <div className="text-white text-2xl font-bold mb-2">All Systems Online</div>
             <div className="text-green-400">Dashboard auto-refreshes every 3 seconds</div>
           </div>
         </div>
