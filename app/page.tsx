@@ -127,7 +127,6 @@ export default function Dashboard() {
   }
 
   const diskPct = parseFloat(stats.system.disk.percent);
-  const netUsage = stats.system.network.usage ?? 0;
 
   return (
     <div className="relative h-screen w-screen overflow-hidden bg-black font-[var(--font-geist-mono)] select-none">
@@ -147,17 +146,17 @@ export default function Dashboard() {
 
       {/* ── blob (fills entire viewport) ── */}
       <div className="absolute inset-0 z-0">
-        <NetworkBlobVisualization networkActivity={netUsage} />
+        <NetworkBlobVisualization activity={stats.system.cpu.usage} />
       </div>
 
       {/* ── center label ── */}
       <div className="absolute inset-0 flex flex-col items-center justify-center z-20 pointer-events-none">
-        <p className="text-white/20 text-[10px] tracking-[0.35em] uppercase mb-1">network</p>
+        <p className="text-white/20 text-[10px] tracking-[0.35em] uppercase mb-1">cpu load</p>
         <p className="text-white/60 text-3xl font-bold tabular-nums tracking-tight">
-          {netUsage.toFixed(1)}<span className="text-lg text-white/30 ml-0.5">%</span>
+          {stats.system.cpu.usage.toFixed(1)}<span className="text-lg text-white/30 ml-0.5">%</span>
         </p>
         <p className="text-white/10 text-[10px] tracking-[0.25em] uppercase mt-2">
-          {stats.system.network.localIp}
+          processor activity
         </p>
       </div>
 

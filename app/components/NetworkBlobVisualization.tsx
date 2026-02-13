@@ -117,12 +117,12 @@ void main() {
 `
 
 interface NetworkBlobVisualizationProps {
-  networkActivity?: number;
+  activity?: number; // 0-100 representing any metric (CPU, network, etc)
   className?: string;
 }
 
 export default function NetworkBlobVisualization({
-  networkActivity = 0,
+  activity = 0,
   className = ""
 }: NetworkBlobVisualizationProps) {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -209,7 +209,7 @@ export default function NetworkBlobVisualization({
 
   useEffect(() => {
     if (!uniformsRef.current) return
-    const t = networkActivity / 100
+    const t = activity / 100
     // intensity: calm at low usage, aggressive at high
     uniformsRef.current.u_intensity.value = 0.2 + t * 1.3
     // speed: faster animation with more activity
@@ -222,7 +222,7 @@ export default function NetworkBlobVisualization({
       color.lerpColors(new THREE.Color(0x00ddff), new THREE.Color(0xffffff), (t - 0.5) * 2)
     }
     uniformsRef.current.u_color.value = color
-  }, [networkActivity])
+  }, [activity])
 
   return (
     <div ref={containerRef} className={`w-full h-full ${className}`} />
