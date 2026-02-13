@@ -133,6 +133,8 @@ export default function NetworkBlobVisualization({
     u_color: { value: THREE.Color };
     u_opacity: { value: number };
   } | null>(null)
+  const targetActivityRef = useRef(activity)
+  const currentActivityRef = useRef(activity)
 
   useEffect(() => {
     if (!containerRef.current) return
@@ -181,6 +183,28 @@ export default function NetworkBlobVisualization({
       uniforms.u_time.value = elapsed
       mesh.rotation.y = elapsed * 0.08
       mesh.rotation.x = elapsed * 0.04
+      
+      // Smoothly interpolate activity value
+      const target = targetActivityRef.current
+      const current = currentActivityRef.current
+      const lerp = 0.05 // smooth factor (lower = smoother)
+      const newCurrent = current + (target - current) * lerp
+      currentActivityRef.current = newCurrent
+      
+      // Update uniforms with smoothed value
+      const t = newCurrent / 100
+      uniforms.u_intensity.value = 0.2 + t * 1.3
+      uniforms.u_speed.value = 0.4 + t * 1.6
+      
+      // Color interpolation
+      const color = new THREE.Color()
+      if (t < 0.5) {
+        color.lerpColors(new THREE.Color(0x00ffaa), new THREE.Color(0x00ddff), t * 2)
+      } else {
+        color.lerpColors(new THREE.Color(0x00ddff), new THREE.Color(0xffffff), (t - 0.5) * 2)
+      }
+      uniforms.u_color.value = color
+      
       renderer.render(scene, camera)
     }
 
@@ -207,21 +231,9 @@ export default function NetworkBlobVisualization({
     }
   }, [])
 
+  // Update target activity - the animation loop will smoothly interpolate to it
   useEffect(() => {
-    if (!uniformsRef.current) return
-    const t = activity / 100
-    // intensity: calm at low usage, aggressive at high
-    uniformsRef.current.u_intensity.value = 0.2 + t * 1.3
-    // speed: faster animation with more activity
-    uniformsRef.current.u_speed.value = 0.4 + t * 1.6
-    // color shift: green -> cyan -> white-hot
-    const color = new THREE.Color()
-    if (t < 0.5) {
-      color.lerpColors(new THREE.Color(0x00ffaa), new THREE.Color(0x00ddff), t * 2)
-    } else {
-      color.lerpColors(new THREE.Color(0x00ddff), new THREE.Color(0xffffff), (t - 0.5) * 2)
-    }
-    uniformsRef.current.u_color.value = color
+    targetActivityRef.current = activity
   }, [activity])
 
   return (

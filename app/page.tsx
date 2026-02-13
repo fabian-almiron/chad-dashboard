@@ -92,6 +92,7 @@ function ArcGauge({ value, max = 100, color }: { value: number; max?: number; co
 export default function Dashboard() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [time, setTime] = useState(new Date());
+  const [smoothCpu, setSmoothCpu] = useState(0);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -115,6 +116,20 @@ export default function Dashboard() {
       clearInterval(timeInterval);
     };
   }, []);
+
+  // Smooth CPU interpolation for display
+  useEffect(() => {
+    if (!stats) return;
+    const target = stats.system.cpu.usage;
+    const interval = setInterval(() => {
+      setSmoothCpu((prev) => {
+        const diff = target - prev;
+        if (Math.abs(diff) < 0.01) return target;
+        return prev + diff * 0.1;
+      });
+    }, 50);
+    return () => clearInterval(interval);
+  }, [stats?.system.cpu.usage]);
 
   if (!stats) {
     return (
@@ -153,7 +168,7 @@ export default function Dashboard() {
       <div className="absolute inset-0 flex flex-col items-center justify-center z-20 pointer-events-none">
         <p className="text-white/20 text-[10px] tracking-[0.35em] uppercase mb-1">cpu load</p>
         <p className="text-white/60 text-3xl font-bold tabular-nums tracking-tight">
-          {stats.system.cpu.usage.toFixed(1)}<span className="text-lg text-white/30 ml-0.5">%</span>
+          {smoothCpu.toFixed(1)}<span className="text-lg text-white/30 ml-0.5">%</span>
         </p>
         <p className="text-white/10 text-[10px] tracking-[0.25em] uppercase mt-2">
           processor activity
